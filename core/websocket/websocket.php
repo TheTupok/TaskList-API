@@ -2,17 +2,21 @@
 
     namespace Socket;
 
+    require "./core/database/database.service.php";
+
     use Ratchet\MessageComponentInterface;
     use Ratchet\ConnectionInterface;
+    use Database\DatabaseService;
 
     class WebSocket implements MessageComponentInterface
     {
-
         private \SplObjectStorage $clients;
+        private DatabaseService $dbService;
 
         public function __construct()
         {
             $this->clients = new \SplObjectStorage;
+            $this->dbService = new DatabaseService();
         }
 
         public function sendMessageToConn($msg, $conn)
@@ -34,6 +38,19 @@
         {
             $msg = json_decode($msg, true);
             $typeOperation = $msg['typeOperation'];
+
+            if($typeOperation == 'getTaskList') {
+                $taskList = $this->dbService->getTaskList();
+                $response = ['typeOperation' => $typeOperation, 'response' => $taskList];
+
+                $this->sendMessageToConn($response, $from);
+            }
+            if($typeOperation == 'editTask') {
+                $taskList = $this->dbService->editTask($msg['request']);
+                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
+
+                $this->sendMessageToConn($response, $from);
+            }
         }
 
         public function onClose(ConnectionInterface $conn)
@@ -44,7 +61,6 @@
 
         public function onError(ConnectionInterface $conn, \Exception $e)
         {
-//            echo "Есть ошибка: {$e->getMessage()}\n";
-//            $conn->close();
+            echo "Есть ошибка: {$e->getMessage()}\n";
         }
     }
