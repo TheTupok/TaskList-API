@@ -1,0 +1,17 @@
+{
+    "name": "tasktracker/api",
+    "autoload": {
+        "psr-4": {
+            "Anatoly\\Api\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anatoly Tereshonok",
+            "email": "ter.tolya@mail.ru"
+        }
+    ],
+    "require": {
+        "cboden/ratchet": "^0.4.4"
+    }
+}
