@@ -59,20 +59,52 @@
         public function editTask($task): array
         {
             $mysqli = $this->openDatabaseConn();
-            $members = json_encode($task['members']);
+            $members = json_encode($task['members'], JSON_UNESCAPED_UNICODE);
             $deadlineDate = $this->dateService->convertDate($task['deadline']);
+
+            $dateOfCompleted = '';
+            if ($task['status'] == 'Complete') {
+                $dateOfCompleted = $this->dateService->getCurrentDate();
+            }
 
             $sql = "UPDATE tasklist SET 
                     taskName = '{$task['taskName']}',
                     executor = '{$task['executor']}',
                     members = '$members',
                     deadline = '$deadlineDate',
+                    dateOfCompleted = '$dateOfCompleted',
                     status = '{$task['status']}',
                     description = '{$task['description']}'
                     WHERE id = {$task['id']}";
 
             $mysqli->query($sql);
 
+            $mysqli->close();
+            return $this->getTaskList();
+        }
+
+        public function addTask(): array
+        {
+            $mysqli = $this->openDatabaseConn();
+            $lastId = $this->getLastId('tasklist') + 1;
+            $sql = "INSERT INTO tasklist 
+                    (id, taskname, status, description) VALUES 
+                    ($lastId, 'New task', 'Work', 'Description')";
+
+            $mysqli->query($sql);
+
+            $mysqli->close();
+            return $this->getTaskList();
+        }
+
+        public function deleteTask($idTask): array
+        {
+            $mysqli = $this->openDatabaseConn();
+            $sql = "DELETE FROM tasklist WHERE id = $idTask";
+
+            $mysqli->query($sql);
+
+            $mysqli->close();
             return $this->getTaskList();
         }
     }

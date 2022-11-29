@@ -51,6 +51,18 @@
 
                 $this->sendMessageToConn($response, $from);
             }
+            if($typeOperation == 'newTask') {
+                $taskList = $this->dbService->addTask();
+                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
+
+                $this->sendMessageToConn($response, $from);
+            }
+            if($typeOperation == 'deleteTask') {
+                $taskList = $this->dbService->deleteTask($msg['request']);
+                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
+
+                $this->sendMessageToConn($response, $from);
+            }
         }
 
         public function onClose(ConnectionInterface $conn)
