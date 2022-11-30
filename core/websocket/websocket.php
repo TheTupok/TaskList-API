@@ -28,6 +28,13 @@
             }
         }
 
+        private function getRowValueAndSendResponse($from): void
+        {
+            $valueRow = $this->dbService->getRowValue();
+            $response = ['typeOperation' => 'getRowValue', 'response' => $valueRow];
+            $this->sendMessageToConn($response, $from);
+        }
+
         public function onOpen(ConnectionInterface $conn)
         {
             $this->clients->attach($conn);
@@ -39,29 +46,25 @@
             $msg = json_decode($msg, true);
             $typeOperation = $msg['typeOperation'];
 
-            if($typeOperation == 'getTaskList') {
-                $taskList = $this->dbService->getTaskList();
+            if ($typeOperation == 'getRowValue') {
+                $this->getRowValueAndSendResponse($from);
+            }
+            if ($typeOperation == 'getTaskList') {
+                $taskList = $this->dbService->getTaskList($msg['pageData']);
                 $response = ['typeOperation' => $typeOperation, 'response' => $taskList];
 
                 $this->sendMessageToConn($response, $from);
             }
-            if($typeOperation == 'editTask') {
-                $taskList = $this->dbService->editTask($msg['request']);
-                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
-
-                $this->sendMessageToConn($response, $from);
+            if ($typeOperation == 'editTask') {
+                $this->dbService->editTask($msg['request']);
             }
-            if($typeOperation == 'newTask') {
-                $taskList = $this->dbService->addTask();
-                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
-
-                $this->sendMessageToConn($response, $from);
+            if ($typeOperation == 'newTask') {
+                $this->dbService->addTask();
+                $this->getRowValueAndSendResponse($from);
             }
-            if($typeOperation == 'deleteTask') {
-                $taskList = $this->dbService->deleteTask($msg['request']);
-                $response = ['typeOperation' => 'getTaskList', 'response' => $taskList];
-
-                $this->sendMessageToConn($response, $from);
+            if ($typeOperation == 'deleteTask') {
+                $this->dbService->deleteTask($msg['request']);
+                $this->getRowValueAndSendResponse($from);
             }
         }
 

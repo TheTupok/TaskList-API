@@ -25,7 +25,7 @@
             return $mysqli;
         }
 
-        public function getLastId($table)
+        public function getLastId($table): int
         {
             $mysqli = $this->openDatabaseConn();
             $sql = "SELECT MAX(id) FROM $table";
@@ -38,10 +38,23 @@
             return $row['MAX(id)'];
         }
 
-        public function getTaskList(): array
+        public function getRowValue(): int
         {
             $mysqli = $this->openDatabaseConn();
-            $sql = "SELECT * FROM tasklist";
+            $sql = "SELECT COUNT(1) FROM tasklist";
+
+            $result = $mysqli->query($sql);
+            $value = $result->fetch_assoc();
+
+            $mysqli->close();
+            return $value['COUNT(1)'];
+        }
+
+        public function getTaskList($pageData): array
+        {
+            $start = $pageData['pageIndex'] * $pageData['pageSize'];
+            $mysqli = $this->openDatabaseConn();
+            $sql = "SELECT * FROM tasklist LIMIT $start, {$pageData['pageSize']}";
 
             $taskList = array();
 
@@ -56,7 +69,7 @@
             return $taskList;
         }
 
-        public function editTask($task): array
+        public function editTask($task): void
         {
             $mysqli = $this->openDatabaseConn();
             $members = json_encode($task['members'], JSON_UNESCAPED_UNICODE);
@@ -78,12 +91,10 @@
                     WHERE id = {$task['id']}";
 
             $mysqli->query($sql);
-
             $mysqli->close();
-            return $this->getTaskList();
         }
 
-        public function addTask(): array
+        public function addTask(): void
         {
             $mysqli = $this->openDatabaseConn();
             $lastId = $this->getLastId('tasklist') + 1;
@@ -92,19 +103,15 @@
                     ($lastId, 'New task', 'Work', 'Description')";
 
             $mysqli->query($sql);
-
             $mysqli->close();
-            return $this->getTaskList();
         }
 
-        public function deleteTask($idTask): array
+        public function deleteTask($idTask): void
         {
             $mysqli = $this->openDatabaseConn();
             $sql = "DELETE FROM tasklist WHERE id = $idTask";
 
             $mysqli->query($sql);
-
             $mysqli->close();
-            return $this->getTaskList();
         }
     }

@@ -1,9 +1,7 @@
 {
     "name": "tasktracker/api",
     "autoload": {
-        "psr-4": {
-            "Anatoly\\Api\\": "src/"
-        }
+
     },
     "authors": [
         {
@@ -12,6 +10,7 @@
         }
     ],
     "require": {
-        "cboden/ratchet": "^0.4.4"
+        "cboden/ratchet": "^0.4.4",
+      "ext-mysqli": "*"
     }
 }
