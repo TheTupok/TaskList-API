@@ -2,19 +2,10 @@
 
     namespace Database;
 
-    require "./core/services/date.service.php";
-
     use mysqli;
-    use DateService;
 
     class DatabaseService
     {
-
-        public function __construct()
-        {
-            $this->dateService = new DateService();
-        }
-
         private function openDatabaseConn()
         {
             $mysqli = new mysqli("localhost", "root", "root", "tasktracker");
@@ -78,7 +69,7 @@
 
             $dateOfCompleted = '';
             if ($task['status'] == 'Complete') {
-                $dateOfCompleted = $this->dateService->getCurrentDate();
+                $dateOfCompleted = date('d.m.Y');
             }
 
             $sql = "UPDATE tasklist SET 
