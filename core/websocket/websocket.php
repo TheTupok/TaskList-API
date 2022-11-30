@@ -50,7 +50,7 @@
                 $this->getRowValueAndSendResponse($from);
             }
             if ($typeOperation == 'getTaskList') {
-                $taskList = $this->dbService->getTaskList($msg['pageData']);
+                $taskList = $this->dbService->getTaskList($msg['pageData'], $msg['sortData']);
                 $response = ['typeOperation' => $typeOperation, 'response' => $taskList];
 
                 $this->sendMessageToConn($response, $from);

@@ -50,11 +50,13 @@
             return $value['COUNT(1)'];
         }
 
-        public function getTaskList($pageData): array
+        public function getTaskList($pageData, $sortData): array
         {
             $start = $pageData['pageIndex'] * $pageData['pageSize'];
             $mysqli = $this->openDatabaseConn();
-            $sql = "SELECT * FROM tasklist LIMIT $start, {$pageData['pageSize']}";
+            $sql = "SELECT * FROM tasklist 
+                    ORDER BY {$sortData['active']} {$sortData['direction']}
+                    LIMIT $start, {$pageData['pageSize']}";
 
             $taskList = array();
 
@@ -73,7 +75,6 @@
         {
             $mysqli = $this->openDatabaseConn();
             $members = json_encode($task['members'], JSON_UNESCAPED_UNICODE);
-            $deadlineDate = $this->dateService->convertDate($task['deadline']);
 
             $dateOfCompleted = '';
             if ($task['status'] == 'Complete') {
@@ -84,7 +85,7 @@
                     taskName = '{$task['taskName']}',
                     executor = '{$task['executor']}',
                     members = '$members',
-                    deadline = '$deadlineDate',
+                    deadline = '{$task['deadline']}',
                     dateOfCompleted = '$dateOfCompleted',
                     status = '{$task['status']}',
                     description = '{$task['description']}'
